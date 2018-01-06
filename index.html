@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Fractional Derivatives Demo</title>
+		<style type="text/css">
+			body{margin:40px auto;max-width:750px;line-height:1.6;font-family:'Open Sans',sans-serif;font-size:18px;color:#444;padding:0 10px}
+			h1,h2,h3{line-height:1.2;font-family:'Open Sans Condensed',sans-serif;font-weight:700;color: #00363a;}
+				.axis line {
+				stroke-opacity: 0.3;
+				shape-rendering: crispEdges;
+				}
+				.grid path {
+				display: none;
+				}
+				.grid line {
+				stroke-opacity: 0.1;
+				shape-rendering: crispEdges;
+				}
+				.view {
+				fill: none;
+				}
+				.dataLine {
+				stroke: steelblue;
+				fill: none;
+				vector-effect: non-scaling-stroke;
+				}
+				.datadxLine {
+				stroke: rgb(255, 127, 14);
+				fill: none;
+				vector-effect: non-scaling-stroke;
+				}
+		</style>
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="./math.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.3/d3-legend.js"></script>
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:700" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,800,800i" rel="stylesheet">
+	</head>
+	<body>
+		<h1>Fractional Derivatives</h1>
+		<h2>Interactive Demonstration</h2>
+		<svg id="FDgraph" style="width:750px;"></svg>
+		<form>
+			<fieldset>
+				<legend>Controls</legend>
+				<p>The above plot shows <label>\(f(x)=\)</label> <input type="text" value="x^2+2x+5"> and 
+				\[\frac{\text{d}^\alpha}{\text{d}x^\alpha} f(x),\]
+				where <label>\(\alpha=\)</label> <input type="text" value="1">.
+				</p>
+			</fieldset>
+		</form>
+		<h2>Theory</h2>
+		<p>This is some theory</p>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/katex.min.css" integrity="sha384-exe4Ak6B0EoJI0ogGxjJ8rn+RN3ftPnEQrGwX59KTCl5ybGzvHGKjhPKk/KC3abb" crossorigin="anonymous">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/katex.min.js" integrity="sha384-OMvkZ24ANLwviZR2lVq8ujbE/bUO8IR1FdBrKLQBI14Gq5Xp/lksIccGkmKL8m+h" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/contrib/auto-render.min.js" integrity="sha384-cXpztMJlr2xFXyDSIfRWYSMVCXZ9HeGXvzyKTYrn03rsMAlOtIQVzjty5ULbaP8L" crossorigin="anonymous"></script>
+		<script src="./fracdiv.js"></script>
+		<script>
+			renderMathInElement(document.body);
+		</script>
+	</body>
+</html>
