@@ -19,13 +19,23 @@
 				.view {
 				fill: none;
 				}
-				.dataLine {
+				.dataLineRe {
 				stroke: steelblue;
 				fill: none;
 				vector-effect: non-scaling-stroke;
 				}
-				.datadxLine {
+				.dataLineIm {
 				stroke: rgb(255, 127, 14);
+				fill: none;
+				vector-effect: non-scaling-stroke;
+				}
+				.dataLinedRe {
+				stroke: rgb(127, 200, 14);
+				fill: none;
+				vector-effect: non-scaling-stroke;
+				}
+				.dataLinedIm {
+				stroke: rgb(250, 14, 14);
 				fill: none;
 				vector-effect: non-scaling-stroke;
 				}
@@ -35,6 +45,7 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.3/d3-legend.js"></script>
 		<link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:700" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,800,800i" rel="stylesheet">
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
 	</head>
 	<body>
 		<h1>Fractional Derivatives</h1>
@@ -43,9 +54,9 @@
 		<form>
 			<fieldset>
 				<legend>Controls</legend>
-				<p>The above plot shows <label>\(f(x)=\)</label> <input type="text" value="x^2+2x+5"> and 
+				<p>The above plot shows <label>\(f(x)=\)</label> <input id="fOfx" type="text" value="x^3"> and 
 				\[\frac{\text{d}^\alpha}{\text{d}x^\alpha} f(x),\]
-				where <label>\(\alpha=\)</label> <input type="text" value="1">.
+				where <label>\(\alpha=\)</label> <input id="dAlpha" type="text" value="1">.
 				</p>
 			</fieldset>
 		</form>

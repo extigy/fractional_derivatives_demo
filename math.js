@@ -7,7 +7,7 @@
  * mathematical functions, and a flexible expression parser.
  *
  * @version 3.18.1
- * @date    2018-01-05
+ * @date    2018-01-07
  *
  * @license
  * Copyright (C) 2013-2017 Jos de Jong <wjosdejong@gmail.com>
@@ -47700,7 +47700,19 @@ function factory (type, config, load, typed) {
 
     'SymbolNode, SymbolNode, ConstantNode, Object': function (node, x, alpha, constNodes) {
       if (constNodes[node] !== undefined) {
-        return new ConstantNode('0', config.number);
+        return new OperatorNode('*', 'multiply', [
+          node.clone(),
+          new OperatorNode('*', 'multiply', [
+              new OperatorNode('/', 'divide', [
+                new FunctionNode('gamma', [new ConstantNode('1', config.number)]),
+                new FunctionNode('gamma', [new OperatorNode('-', 'subtract', [new ConstantNode('1', config.number),alpha])])
+              ]),
+              new OperatorNode('^', 'pow', [
+                x.clone(),
+                new OperatorNode('-', 'subtract', [new ConstantNode(0),alpha])
+              ])
+          ])
+        ]);
       }
       return new OperatorNode('*', 'multiply', [
           new OperatorNode('/', 'divide', [
@@ -47720,7 +47732,19 @@ function factory (type, config, load, typed) {
 
     'FunctionAssignmentNode, SymbolNode, ConstantNode, Object': function (node, x, alpha, constNodes) {
       if (constNodes[node] !== undefined) {
-        return new ConstantNode('0', config.number);
+        return new OperatorNode('*', 'multiply', [
+          node.clone(),
+          new OperatorNode('*', 'multiply', [
+              new OperatorNode('/', 'divide', [
+                new FunctionNode('gamma', [new ConstantNode('1', config.number)]),
+                new FunctionNode('gamma', [new OperatorNode('-', 'subtract', [new ConstantNode('1', config.number),alpha])])
+              ]),
+              new OperatorNode('^', 'pow', [
+                x.clone(),
+                new OperatorNode('-', 'subtract', [new ConstantNode(0),alpha])
+              ])
+          ])
+        ]);
       }
       return _derivative(node.expr, x, alpha, constNodes);
     },
@@ -47731,7 +47755,19 @@ function factory (type, config, load, typed) {
       }
 
       if (constNodes[node] !== undefined) {
-        return new ConstantNode('0', config.number);
+        return new OperatorNode('*', 'multiply', [
+          node.clone(),
+          new OperatorNode('*', 'multiply', [
+              new OperatorNode('/', 'divide', [
+                new FunctionNode('gamma', [new ConstantNode('1', config.number)]),
+                new FunctionNode('gamma', [new OperatorNode('-', 'subtract', [new ConstantNode('1', config.number),alpha])])
+              ]),
+              new OperatorNode('^', 'pow', [
+                x.clone(),
+                new OperatorNode('-', 'subtract', [new ConstantNode(0),alpha])
+              ])
+          ])
+        ]);
       }
 
       var arg1 = node.args[0];
@@ -47760,16 +47796,32 @@ function factory (type, config, load, typed) {
       /* Apply chain rule to all functions:
          F(x)  = f(g(x))
          F'(x) = g'(x)*f'(g(x)) */
-      var chainDerivative = _fderivative(arg1, x, alpha, constNodes);
-      if (negative) {
-        chainDerivative = new OperatorNode('-', 'unaryMinus', [chainDerivative]);
-      }
-      return new OperatorNode(op, func, [chainDerivative, funcDerivative]);
+      //var chainDerivative = _fderivative(arg1, x, alpha, constNodes);
+      //if (negative) {
+      //  chainDerivative = new OperatorNode('-', 'unaryMinus', [chainDerivative]);
+      //}
+      //return new OperatorNode(op, func, [chainDerivative, funcDerivative]);
+      throw new Error('Chain rule not yet supported by fractional derivative.');
     },
 
     'OperatorNode, SymbolNode, ConstantNode, Object': function (node, x, alpha, constNodes) {
+      //if (alpha == '0') {
+      //  return node;
+      //}
       if (constNodes[node] !== undefined) {
-        return new ConstantNode('0', config.number);
+        return new OperatorNode('*', 'multiply', [
+          node.clone(),
+          new OperatorNode('*', 'multiply', [
+              new OperatorNode('/', 'divide', [
+                new FunctionNode('gamma', [new ConstantNode('1', config.number)]),
+                new FunctionNode('gamma', [new OperatorNode('-', 'subtract', [new ConstantNode('1', config.number),alpha])])
+              ]),
+              new OperatorNode('^', 'pow', [
+                x.clone(),
+                new OperatorNode('-', 'subtract', [new ConstantNode(0),alpha])
+              ])
+          ])
+        ]);
       }
 
       var arg1 = node.args[0];
@@ -47798,51 +47850,39 @@ function factory (type, config, load, typed) {
             return new OperatorNode('*', 'multiply', newArgs);
           }
 
-          // Product Rule, d/dx(f(x)*g(x)) = f'(x)*g(x) + f(x)*g'(x)
-          return new OperatorNode('+', 'add', [
-            new OperatorNode('*', 'multiply', [_fderivative(arg1, x, alpha, constNodes), arg2.clone()]),
-            new OperatorNode('*', 'multiply', [arg1.clone(), _fderivative(arg2, x, alpha, constNodes)])
-          ]);
+          throw new Error('Product rule not yet supported by fractional derivative.');
         case '/':
           // d/dx(f(x) / c) = f'(x) / c
           if (constNodes[arg2] !== undefined) {
             return new OperatorNode('/', 'divide', [_fderivative(arg1, x, alpha, constNodes), arg2]);
           }
 
-          // Reciprocal Rule, d/dx(c / f(x)) = -c(f'(x)/f(x)^2)
-          if (constNodes[arg1] !== undefined) {
-            return new OperatorNode('*', 'multiply', [
-              new OperatorNode('-', 'unaryMinus', [arg1]),
-              new OperatorNode('/', 'divide', [
-                _fderivative(arg2, x, alpha, constNodes),
-                new OperatorNode('^', 'pow', [arg2.clone(), new ConstantNode('2', config.number)])
-              ])
-            ]);
-          }
-
           // Quotient rule, d/dx(f(x) / g(x)) = (f'(x)g(x) - f(x)g'(x)) / g(x)^2
-          return new OperatorNode('/', 'divide', [
-            new OperatorNode('-', 'subtract', [
-              new OperatorNode('*', 'multiply', [_fderivative(arg1, x, alpha, constNodes), arg2.clone()]),
-              new OperatorNode('*', 'multiply', [arg1.clone(), _fderivative(arg2, x, alpha, constNodes)])
-            ]),
-            new OperatorNode('^', 'pow', [arg2.clone(), new ConstantNode('2', config.number)])
-          ]);
+          //return new OperatorNode('/', 'divide', [
+          //  new OperatorNode('-', 'subtract', [
+          //    new OperatorNode('*', 'multiply', [_fderivative(arg1, x, alpha, constNodes), arg2.clone()]),
+          //    new OperatorNode('*', 'multiply', [arg1.clone(), _fderivative(arg2, x, alpha, constNodes)])
+          //  ]),
+          //  new OperatorNode('^', 'pow', [arg2.clone(), new ConstantNode('2', config.number)])
+          //]);
+          throw new Error('Quotient rule not yet supported by fractional derivative.');
         case '^':
           if (constNodes[arg1] !== undefined) {
             // If is secretly constant; 0^f(x) = 1 (in JS), 1^f(x) = 1
             if (type.isConstantNode(arg1) && (arg1.value === '0' || arg1.value === '1')) {
-              return new ConstantNode('0', config.number);
+              return _fderivative(new ConstantNode('1', config.number), x, alpha, constNodes);
             }
 
+            // TODO: fix
             // d/dx(c^f(x)) = c^f(x)*ln(c)*f'(x)
-            return new OperatorNode('*', 'multiply', [
-              node,
-              new OperatorNode('*', 'multiply', [
-                new FunctionNode('log', [arg1.clone()]),
-                _fderivative(arg2.clone(), x, alpha, constNodes)
-              ])
-            ]);
+            //return new OperatorNode('*', 'multiply', [
+            //  node,
+            //  new OperatorNode('*', 'multiply', [
+            //    new FunctionNode('log', [arg1.clone()]),
+            //    _fderivative(arg2.clone(), x, alpha, constNodes)
+            //  ])
+            //]);
+            //throw new Error('Power rule not yet supported by fractional derivative.');
           }
 
           if (constNodes[arg2] !== undefined) {
@@ -47858,39 +47898,58 @@ function factory (type, config, load, typed) {
                 return _fderivative(arg1, x, alpha, constNodes);
               }
             }
-
-            // Elementary Power Rule, d/dx(f(x)^c) = c*f'(x)*f(x)^(c-1)
-            var powMinusOne = new OperatorNode('^', 'pow', [
-              arg1.clone(),
-              new OperatorNode('-', 'subtract', [
-                arg2,
-                new ConstantNode('1', config.number)
-              ])
-            ]);
-
-            return new OperatorNode('*', 'multiply', [
-              arg2.clone(),
-              new OperatorNode('*', 'multiply', [
-                _fderivative(arg1, x, alpha, constNodes),
-                powMinusOne
-              ]),
-            ]);
           }
-
+          // TODO: FIX. FOR NOW ASSUMING ARG2 IS CONST
           // Functional Power Rule, d/dx(f^g) = f^g*[f'*(g/f) + g'ln(f)]
+          // Constant Power Rule, d/dx(g(x)^c)
+          // chain rule:  F(x)  = f(g(x)) -> F'(x) = gamma(2-a)x^(1-a)/gamma(2)*g'(x)*f'(g(x))
+          //F'(x) = x^(a-1)*gamma(2-a)/gamma(2)*g'(x)*gamma(c+1)/gamma(c-a+1)*g(x)^(c-a)
           return new OperatorNode('*', 'multiply', [
-            new OperatorNode('^', 'pow', [arg1.clone(), arg2.clone()]),
-            new OperatorNode('+', 'add', [
-              new OperatorNode('*', 'multiply', [
-                _fderivative(arg1, x, alpha, constNodes),
-                new OperatorNode('/', 'divide', [arg2.clone(), arg1.clone()])
-              ]),
-              new OperatorNode('*', 'multiply', [
-                _fderivative(arg2, x, alpha, constNodes),
-                new FunctionNode('log', [arg1.clone()])
-              ])
-            ])
-          ]);
+                 new OperatorNode('*', 'multiply', [
+                  new OperatorNode('/', 'divide', [
+                    new FunctionNode('gamma', [
+                        new OperatorNode('-', 'subtract', [
+                            new ConstantNode('2', config.number),
+                            alpha
+                        ])
+                    ]),
+                    new FunctionNode('gamma', [new ConstantNode('2', config.number)])
+                  ]),
+                  new OperatorNode('*', 'multiply', [
+                    new OperatorNode('/', 'divide', [
+                      new FunctionNode('gamma', [
+                            new OperatorNode('+', 'add', [
+                                arg2.clone(),
+                                new ConstantNode('1', config.number)
+                            ])
+                      ]),
+                      new FunctionNode('gamma', [
+                          new OperatorNode('+', 'add', [
+                              new OperatorNode('-', 'subtract', [
+                                  arg2.clone(),
+                                  alpha
+                              ]),
+                              new ConstantNode('1', config.number)
+                          ])
+                      ])
+                    ]),
+                    new OperatorNode('*', 'multiply', [
+                        new OperatorNode('^', 'pow', [
+                            arg1.clone(),
+                            new OperatorNode('-', 'subtract', [arg2.clone(),alpha])
+                        ]),
+                        _fderivative(arg1.clone(), x, alpha, constNodes)
+                    ])
+                ])
+                ]),
+                new OperatorNode('^', 'pow', [x.clone(),
+                  new OperatorNode('-', 'subtract', [
+                      alpha,
+                      new ConstantNode('1', config.number),
+                  ])
+                ]),
+                ])
+
         case '%':
         case 'mod':
         default: throw new Error('Operator "' + node.op + '" not supported by derivative');
