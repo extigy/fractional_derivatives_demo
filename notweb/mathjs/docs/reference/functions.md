@@ -40,7 +40,6 @@ Function | Description
 Function | Description
 ---- | -----------
 [derivative(expr,&nbsp;variable)](functions/derivative.md) | Takes the derivative of an expression expressed in parser Nodes.
-[fderivative](functions/fderivative.md) | /* Apply chain rule to all functions:          F(x)  = f(g(x))          F'(x) = g'(x)*f'(g(x)) .
 [math.lsolve(L,&nbsp;b)](functions/lsolve.md) | Solves the linear equation system by forwards substitution.
 [math.lup(A)](functions/lup.md) | Calculate the Matrix LU decomposition with partial pivoting.
 [math.lusolve(A,&nbsp;b)](functions/lusolve.md) | Solves the linear system `A * x = b` where `A` is an [n x n] matrix and `b` is a [n] column vector.
