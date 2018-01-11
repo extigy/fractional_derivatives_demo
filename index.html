@@ -51,13 +51,14 @@
 		<h1>Fractional Derivatives</h1>
 		<h2>Interactive Demonstration</h2>
 		<svg id="FDgraph" style="width:750px;"></svg>
-		<form>
+		<form onsubmit="return false;">
 			<fieldset>
 				<legend>Controls</legend>
 				<p>The above plot shows <label>\(f(x)=\)</label> <input id="fOfx" type="text" value="x^3"> and 
 				\[\frac{\text{d}^\alpha}{\text{d}x^\alpha} f(x),\]
-				where <label>\(\alpha=\)</label> <input id="dAlpha" type="text" value="1">.
+				where <label>\(\alpha=\) <span id="dAlphaShow">1</span></label><br><input type="range" min="-2" max="2" step ="0.01" value="1" class="slider" id="dAlpha">.
 				</p>
+				<p>
 			</fieldset>
 		</form>
 		<h2>Theory</h2>

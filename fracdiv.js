@@ -7,13 +7,14 @@ var dataRe;
 var dataIm;
 var datadRe;
 var datadIm;
+var dfdxNode;
 
 var updateData = function(formula,dAlpha){
   var fOfxNode = math.parse(formula);
-  var dfdxNode = math.fderivative(math.parse(formula).toString(),'x',dAlpha);
+  dfdxNode = math.fderivative(math.parse(formula).toString(),'x',dAlpha);
 
-  N = 10000
-  datax = Array.from(Array.apply(null, {length: N}).map(Function.call, Number),x => ((x-5000) / 50)+1e-8);
+  N = 1000
+  datax = Array.from(Array.apply(null, {length: N}).map(Function.call, Number),x => ((x-500) / 5)+1e-8);
   dataRe = datax.map(function(e, i) {
     fxval = fOfxNode.eval({x: e})
     if (typeof(fxval) == "number"){
@@ -50,8 +51,8 @@ var updateData = function(formula,dAlpha){
 }
 updateData('x^3','1');
 
-var x = d3.scaleLinear().domain([-0.47,10.2]).range([0, w]);
-var y = d3.scaleLinear().domain([-0.54,10.2]).range([h, 0]);
+var x = d3.scaleLinear().domain([-10,10]).range([0, w]);
+var y = d3.scaleLinear().domain([-10,30]).range([h, 0]);
 
 var line = d3.line().x(function(d) {return x(d[0]);}).y(function(d) {return y(d[1]);});
 
@@ -71,13 +72,15 @@ var zoom = d3.zoom().scaleExtent([0.04, 80]).translateExtent([[-15000, -10000], 
 graph.call(zoom);
 
 dataLineRe = graph.append("svg:path").attr("class","dataLineRe").attr("d", line(dataRe));
-dataLineIm = graph.append("svg:path").attr("class","dataLineIm").attr("d", line(dataIm));
+//dataLineIm = graph.append("svg:path").attr("class","dataLineIm").attr("d", line(dataIm));
 dataLinedRe = graph.append("svg:path").attr("class","dataLinedRe").attr("d", line(datadRe));
 dataLinedIm = graph.append("svg:path").attr("class","dataLinedIm").attr("d", line(datadIm));
 
 var ordinal = d3.scaleOrdinal()
-  .domain(["Re(f(x))", "Im(f(x))", "Re(d\u1D45f/dx\u1D45)", "Im(d\u1D45f/dx\u1D45)"])
-  .range([ "steelblue", "rgb(255, 127, 14)","rgb(127, 200, 14)","rgb(250, 14, 14)"]);
+  //.domain(["Re(f(x))", "Im(f(x))", "Re(d\u1D45f/dx\u1D45)", "Im(d\u1D45f/dx\u1D45)"])
+  //.range([ "steelblue", "rgb(255, 127, 14)","rgb(127, 200, 14)","rgb(250, 14, 14)"]);
+  .domain(["Re(f(x))", "Re(d\u1D45f/dx\u1D45)", "Im(d\u1D45f/dx\u1D45)"])
+  .range([ "steelblue","rgb(127, 200, 14)","rgb(250, 14, 14)"]);
 
 graph.append("g")
   .attr("class", "legendOrdinal")
@@ -93,10 +96,11 @@ graph.select(".legendOrdinal").call(legendOrdinal);
 
 function zoomed() {
   dataLineRe.attr("transform", d3.event.transform);
-  dataLineIm.attr("transform", d3.event.transform);
+  //dataLineIm.attr("transform", d3.event.transform);
   dataLinedRe.attr("transform", d3.event.transform);
   dataLinedIm.attr("transform", d3.event.transform);
   gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
+  console.log(d3.event.transform.rescaleX(x)(-10))
   gXgrid.call(xGrid.scale(d3.event.transform.rescaleX(x)));
   gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
   gYgrid.call(yGrid.scale(d3.event.transform.rescaleY(y)));
@@ -105,14 +109,15 @@ function zoomed() {
 $("#fOfx").change(function(e){
   updateData($("#fOfx").val(),$("#dAlpha").val());
   dataLineRe.attr("d", line(dataRe));
-  dataLineIm.attr("d", line(dataIm));
+  //dataLineIm.attr("d", line(dataIm));
   dataLinedRe.attr("d", line(datadRe));
   dataLinedIm.attr("d", line(datadIm));
 });
 $("#dAlpha").change(function(e){
+  $("#dAlphaShow").html($("#dAlpha").val());
   updateData($("#fOfx").val(),$("#dAlpha").val());
   dataLineRe.attr("d", line(dataRe));
-  dataLineIm.attr("d", line(dataIm));
+  //dataLineIm.attr("d", line(dataIm));
   dataLinedRe.attr("d", line(datadRe));
   dataLinedIm.attr("d", line(datadIm));
 });
